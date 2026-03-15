@@ -1,0 +1,58 @@
+services:
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
+    depends_on:
+      - influxdb
+      - prometheus
+    networks:
+      - jmeter-influxdb-prometheus-cadvisor-grafana
+
+  influxdb:
+    image: influxdb:1.8
+    volumes:
+      - ./influxdb_data:/var/lib/influxdb
+    ports:
+      - 8086:8086
+    environment:
+      - INFLUXDB_DB=jmeter_db
+    networks:
+      - jmeter-influxdb-prometheus-cadvisor-grafana
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    networks:
+      - jmeter-influxdb-prometheus-cadvisor-grafana
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    ports:
+      - 8080:8080
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      - jmeter-influxdb-prometheus-cadvisor-grafana
+
+  jmeter:
+    image: justb4/jmeter:5.5
+    volumes:
+      - ./scripts:/scripts
+      - ./results:/results
+    # Este comando se ejecutará cuando hagamos 'docker compose run'
+    entrypoint: ["jmeter", "-n", "-t", "/scripts/blazedemo.jmx"]
+    networks:
+      - jmeter-influxdb-prometheus-cadvisor-grafana
+
+networks:
+  jmeter-influxdb-prometheus-cadvisor-grafana:
