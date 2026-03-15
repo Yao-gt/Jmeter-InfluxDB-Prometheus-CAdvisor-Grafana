@@ -79,7 +79,7 @@ docker compose ps
 
 ```yaml
 global:
-  scrape_interval: 5s # Frecuencia de recolección
+  scrape_interval: 5s # Frequency of collection
 
 scrape_configs:
   - job_name: 'cadvisor'
@@ -140,7 +140,7 @@ services:
     volumes:
       - ./scripts:/scripts
       - ./results:/results
-    # Este comando se ejecutará cuando hagamos 'docker compose run'
+    # This command will be trigger when we run 'docker compose run'
     entrypoint: ["jmeter", "-n", "-t", "/scripts/test_demoblaze.jmx", "-l", "/results/resultado.jtl"]
 ```
 
